@@ -1,0 +1,13 @@
+{
+  "name": "EggLogan Egg Storage System",
+  "short_name": "EggLogan",
+  "description": "Egg Storage & Inventory Management System",
+  "start_url": "/Egglogan/index.php",
+  "display": "standalone",
+  "background_color": "#E67E22",
+  "theme_color": "#E67E22",
+  "orientation": "any",
+  "icons": [
+    { "src": "assets/images/favicon-icon.png", "sizes": "1254x1254", "type": "image/png" }
+  ]
+}

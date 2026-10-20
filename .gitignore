@@ -1,0 +1,27 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Private data and runtime files
+/backups/*
+!/backups/.htaccess
+/uploads/*
+!/uploads/.gitkeep
+*.log
+*.bak
+*.tmp
+*.sql.gz
+*.sql.zip
+
+# Editor and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+node_modules/

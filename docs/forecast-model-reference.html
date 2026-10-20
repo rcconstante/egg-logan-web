@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EggLogan Forecast &amp; Stock Evaluation — Model Reference</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+  :root{
+    --ink:#1a1a1a; --ink-2:#4a4a4a; --ink-3:#767676;
+    --rule:#d8d2c4; --rule-2:#ebe6da;
+    --bg-soft:#faf8f3;
+    --accent:#8a5a2b; --accent-soft:#f4ece0;
+    --green:#1B6B47; --green-bg:#DFF0E5;
+    --amber:#9A6A0B; --amber-bg:#FCF3DE;
+    --red:#A93226;   --red-bg:#FBE4E0;
+    --blue:#1f5673;  --blue-bg:#e2edf4;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+  body{
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    font-size:10.2pt; line-height:1.55; color:var(--ink); margin:0;
+    background:#fff;
+  }
+
+  /* ---------- Cover ---------- */
+  .cover{
+    min-height:247mm; display:flex; flex-direction:column; justify-content:space-between;
+    page-break-after:always; padding-top:8mm;
+  }
+  .cover-top{ border-top:3px solid var(--ink); padding-top:5mm; }
+  .eyebrow{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8pt; letter-spacing:.18em; text-transform:uppercase; color:var(--accent);
+    font-weight:700; margin:0 0 4mm;
+  }
+  h1{
+    font-size:30pt; line-height:1.1; margin:0 0 4mm; font-weight:600; letter-spacing:-.015em;
+  }
+  .cover-sub{
+    font-size:12pt; color:var(--ink-2); font-style:italic; margin:0 0 8mm; max-width:150mm;
+  }
+  .cover-rule{ height:1px; background:var(--rule); margin:0 0 7mm; }
+  .cover-meta{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8.5pt; color:var(--ink-3); display:flex; gap:6mm; flex-wrap:wrap;
+  }
+  .cover-lead{
+    font-size:11pt; line-height:1.62; color:var(--ink-2); max-width:158mm; margin:0 0 7mm;
+  }
+  .cover-lead strong{ color:var(--ink); }
+  .cover-cards{ display:flex; gap:4mm; }
+  .ccard{
+    flex:1; border:1px solid var(--rule); border-top:2.5px solid var(--accent);
+    padding:4mm 4mm 4mm; background:var(--bg-soft);
+  }
+  .ccard-n{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:19pt; font-weight:700; line-height:1; color:var(--accent); letter-spacing:-.02em;
+  }
+  .ccard-l{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:7.6pt; text-transform:uppercase; letter-spacing:.09em; color:var(--ink-2);
+    margin-top:1.6mm; line-height:1.35;
+  }
+
+  /* ---------- Typography ---------- */
+  h2{
+    font-size:16pt; margin:0 0 1mm; font-weight:600; letter-spacing:-.01em;
+    padding-bottom:2mm; border-bottom:2px solid var(--ink);
+  }
+  h2 .num{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:9pt; color:var(--accent); font-weight:700; margin-right:3mm; letter-spacing:.05em;
+  }
+  h3{
+    font-size:11.6pt; margin:7mm 0 2.5mm; font-weight:600;
+  }
+  h4{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8.4pt; margin:5mm 0 2mm; font-weight:700;
+    text-transform:uppercase; letter-spacing:.1em; color:var(--accent);
+  }
+  p{ margin:0 0 2.6mm; }
+  .lead{ font-size:10.6pt; color:var(--ink-2); margin-bottom:4mm; }
+  code, .mono{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",monospace;
+    font-size:8.5pt; background:var(--bg-soft); border:1px solid var(--rule-2);
+    padding:.3mm 1.1mm; border-radius:1.5px; color:#5a3a18; white-space:nowrap;
+  }
+  strong{ font-weight:650; }
+  em.plain{ font-style:italic; color:var(--ink-2); }
+  .src{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:7.4pt; color:var(--ink-3); white-space:nowrap;
+  }
+
+  section{ page-break-before:always; }
+  section.first{ page-break-before:avoid; }
+
+  /* ---------- Tables ---------- */
+  table{
+    width:100%; border-collapse:collapse; margin:0 0 4mm; font-size:9.1pt;
+  }
+  th{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:7.4pt; text-transform:uppercase; letter-spacing:.07em; font-weight:700;
+    text-align:left; padding:2.2mm 2.6mm; background:var(--accent-soft);
+    color:#4a3418; border-bottom:1px solid var(--rule); vertical-align:bottom;
+  }
+  td{
+    padding:2.2mm 2.6mm; border-bottom:1px solid var(--rule-2); vertical-align:top;
+    line-height:1.45;
+  }
+  tbody tr:nth-child(even) td{ background:#fcfbf7; }
+  td.k{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:8.2pt; color:#5a3a18; white-space:nowrap; font-weight:600;
+  }
+  td.v{ font-weight:650; white-space:nowrap; }
+  th.num, td.num{ text-align:right; white-space:nowrap; }
+  .note{ font-size:8.6pt; color:var(--ink-2); font-style:italic; }
+
+  /* ---------- Callouts ---------- */
+  .box{
+    border:1px solid var(--rule); border-left:3px solid var(--accent);
+    background:var(--bg-soft); padding:3.4mm 4mm; margin:0 0 4mm;
+  }
+  .box.warn{ border-left-color:#c0392b; background:#fdf4f2; }
+  .box.good{ border-left-color:var(--green); background:#f2f9f5; }
+  .box-t{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:7.6pt; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+    margin:0 0 1.6mm; color:var(--accent);
+  }
+  .box.warn .box-t{ color:#c0392b; }
+  .box.good .box-t{ color:var(--green); }
+  .box p:last-child, .box ul:last-child{ margin-bottom:0; }
+
+  ul, ol{ margin:0 0 3mm; padding-left:5.5mm; }
+  li{ margin-bottom:1.4mm; }
+
+  /* ---------- Pills ---------- */
+  .pill{
+    display:inline-block; font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:7pt; font-weight:700; padding:.5mm 2mm; border-radius:2mm;
+    letter-spacing:.03em; white-space:nowrap;
+  }
+  .p-green{ background:var(--green-bg); color:var(--green); }
+  .p-amber{ background:var(--amber-bg); color:var(--amber); }
+  .p-red{ background:var(--red-bg); color:var(--red); }
+  .p-blue{ background:var(--blue-bg); color:var(--blue); }
+  .p-gray{ background:#eeeae1; color:#6b6b6b; }
+
+  /* ---------- Flow ---------- */
+  .flow{ margin:0 0 5mm; }
+  .fstep{
+    display:flex; gap:3.5mm; padding:2.8mm 0; border-bottom:1px dashed var(--rule);
+    align-items:flex-start;
+  }
+  .fstep:last-child{ border-bottom:none; }
+  .fnum{
+    flex:0 0 7mm; height:7mm; border-radius:50%; background:var(--accent); color:#fff;
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8pt; font-weight:700; display:flex; align-items:center; justify-content:center;
+    margin-top:.4mm;
+  }
+  .fbody{ flex:1; }
+  .ft{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8.6pt; font-weight:700; margin-bottom:.8mm;
+  }
+  .fd{ font-size:9.4pt; color:var(--ink-2); }
+
+  /* ---------- Two column ---------- */
+  .cols{ display:flex; gap:6mm; }
+  .col{ flex:1; }
+
+  /* ---------- Feature cards ---------- */
+  .feat{
+    border:1px solid var(--rule); border-left:3px solid var(--blue);
+    padding:3mm 3.5mm; margin-bottom:3mm; background:#fcfdfe;
+    page-break-inside:avoid;
+  }
+  .feat-h{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:9pt; font-weight:700; color:var(--blue); margin-bottom:1.4mm;
+  }
+  .feat-q{ font-style:italic; color:var(--ink-2); font-size:9.4pt; margin-bottom:1.6mm; }
+  .feat-r{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8pt; color:var(--ink-3); margin-top:1.6mm; padding-top:1.4mm;
+    border-top:1px dotted var(--rule);
+  }
+
+  /* ---------- Worked example ---------- */
+  .calc{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:8.4pt; background:var(--bg-soft); border:1px solid var(--rule-2);
+    padding:3mm 3.5mm; line-height:1.7; margin:0 0 4mm; color:#3d3d3d;
+    white-space:pre-wrap;
+  }
+  .calc b{ color:var(--accent); }
+
+  /* ---------- TOC ---------- */
+  .toc{ font-size:10pt; }
+  .toc-row{
+    display:flex; align-items:baseline; gap:2mm; padding:2.2mm 0;
+    border-bottom:1px solid var(--rule-2);
+  }
+  .toc-n{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8pt; font-weight:700; color:var(--accent); min-width:6mm;
+  }
+  .toc-t{ flex:1; }
+  .toc-d{ font-size:8.8pt; color:var(--ink-3); font-style:italic; }
+  .toc-p{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8.4pt; color:var(--ink-3);
+  }
+
+  .legend{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:7.8pt; color:var(--ink-3); margin-top:3mm; font-style:italic;
+  }
+
+  .avoid{ page-break-inside:avoid; }
+  .mb0{ margin-bottom:0; }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <div class="cover-top">
+    <p class="eyebrow">Technical Reference</p>
+    <h1>Forecast &amp; Stock<br>Evaluation Reference</h1>
+    <p class="cover-sub">Every threshold, rule, and variable behind the Sales Forecast, Low&nbsp;Stock alerts, FIFO Urgency tags, and Model Accuracy gauges in EggLogan Egg Storage.</p>
+    <div class="cover-rule"></div>
+    <div class="cover-meta">
+      <span>EggLogan Egg Storage</span>
+      <span>&#183;</span>
+      <span>K-Nearest-Neighbour demand forecasting</span>
+      <span>&#183;</span>
+      <span>PHP 8 / MySQL</span>
+    </div>
+  </div>
+
+  <div>
+    <p class="cover-lead">
+      This document explains, in plain language first and exact code second, how the system decides
+      whether you have <strong>enough stock</strong>, how urgently a tray should be sold, and how much
+      the forecast itself can be trusted. It lists every numeric threshold it uses and names every
+      variable in the model — the ones that go in (<em class="plain">independent</em>) and the ones that
+      come out (<em class="plain">dependent</em>).
+    </p>
+
+    <div class="cover-cards">
+      <div class="ccard">
+        <div class="ccard-n">5</div>
+        <div class="ccard-l">Stock &amp; forecast<br>classifications</div>
+      </div>
+      <div class="ccard">
+        <div class="ccard-n">7</div>
+        <div class="ccard-l">Independent<br>model features</div>
+      </div>
+      <div class="ccard">
+        <div class="ccard-n">2</div>
+        <div class="ccard-l">Dependent<br>target variables</div>
+      </div>
+      <div class="ccard">
+        <div class="ccard-n">11</div>
+        <div class="ccard-l">Evaluation<br>metrics</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="cover-rule" style="margin-bottom:4mm"></div>
+    <div class="cover-meta">
+      <span>Source: <code>classes/KNNPredictor.php</code>, <code>classes/ModelEvaluator.php</code>, <code>classes/AlertManager.php</code>, <code>includes/functions.php</code>, <code>pages/predictions.php</code>, <code>pages/picklist.php</code></span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOC + HOW IT WORKS ============ -->
+<section class="first">
+
+  <h2><span class="num">00</span>Contents</h2>
+  <div class="toc">
+    <div class="toc-row"><span class="toc-n">01</span><span class="toc-t">How the whole thing works</span><span class="toc-d">the five-step journey from sales history to a verdict</span></div>
+    <div class="toc-row"><span class="toc-n">02</span><span class="toc-t">The five classifications &amp; their thresholds</span><span class="toc-d">exact cut-off values, in one place</span></div>
+    <div class="toc-row"><span class="toc-n">03</span><span class="toc-t">Independent variables (the inputs)</span><span class="toc-d">the 7 features, explained one by one</span></div>
+    <div class="toc-row"><span class="toc-n">04</span><span class="toc-t">Dependent variables (the outputs)</span><span class="toc-d">what the model is actually predicting</span></div>
+    <div class="toc-row"><span class="toc-n">05</span><span class="toc-t">Stock &amp; lifecycle variables</span><span class="toc-d">the inputs thresholds use but the model does not</span></div>
+    <div class="toc-row"><span class="toc-n">06</span><span class="toc-t">Evaluation variables</span><span class="toc-d">how the model grades itself</span></div>
+    <div class="toc-row"><span class="toc-n">07</span><span class="toc-t">Worked examples</span><span class="toc-d">the same numbers worked through by hand</span></div>
+    <div class="toc-row"><span class="toc-n">08</span><span class="toc-t">Reference data &amp; code map</span><span class="toc-d">egg sizes, and where each rule lives</span></div>
+    <div class="toc-row"><span class="toc-n">09</span><span class="toc-t">Caveats &amp; inconsistencies</span><span class="toc-d">three things worth knowing before you trust a number</span></div>
+  </div>
+  <p class="note" style="margin-top:3mm">Use the PDF bookmark panel to jump between sections.</p>
+
+  <h2 style="margin-top:10mm"><span class="num">01</span>How the whole thing works</h2>
+
+  <p class="lead">
+    One idea powers the whole system: <strong>find past days that looked like today, and average what
+    you sold on them.</strong> Everything else — the confidence badge, the restock warning, the
+    accuracy gauge — is built on top of that single act of comparison.
+  </p>
+
+  <div class="flow">
+    <div class="fstep">
+      <div class="fnum">1</div>
+      <div class="fbody">
+        <div class="ft">Describe today</div>
+        <div class="fd">The system builds a fingerprint of today: which weekday it is, whether it is a
+        weekend or a Philippine holiday, and how much demand the last 7, 14 and 30 days averaged, plus
+        whether demand is rising or falling. That fingerprint is <strong>7 numbers</strong> — the independent variables.</div>
+      </div>
+    </div>
+
+    <div class="fstep">
+      <div class="fnum">2</div>
+      <div class="fbody">
+        <div class="ft">Find the look-alikes</div>
+        <div class="fd">Every past sales day for that egg size — up to <strong>365 days</strong> of history — gets
+        the same fingerprint. Each one is compared with today using a distance formula, and the closest
+        few are kept. Nothing is scored on days after the day being predicted.</div>
+      </div>
+    </div>
+
+    <div class="fstep">
+      <div class="fnum">3</div>
+      <div class="fbody">
+        <div class="ft">Average them, weighted</div>
+        <div class="fd">The nearest <strong>k</strong> days are averaged. Closer days count more
+        (<code>1/√distance</code>), and older days fade further (<code>e^(−daysAgo/τ)</code>). The model
+        picks <em>k</em> itself by trying 3, 5, 7 and 9 and keeping whichever scores best in a walk-forward test.</div>
+      </div>
+    </div>
+
+    <div class="fstep">
+      <div class="fnum">4</div>
+      <div class="fbody">
+        <div class="ft">Convert to eggs, money, and a confidence band</div>
+        <div class="fd">The tray average is rounded once, then multiplied by that size's tray capacity to
+        get eggs. Money is forecast by a <strong>second, independent pass</strong> over the same days.
+        A 90% bootstrap band is drawn around the tray number, and a confidence level is assigned from
+        how many past days were available.</div>
+      </div>
+    </div>
+
+    <div class="fstep">
+      <div class="fnum">5</div>
+      <div class="fbody">
+        <div class="ft">Compare against the shelf and give a verdict</div>
+        <div class="fd">Expected eggs are subtracted from eggs actually in stock. The result decides
+        one of three verdicts — <strong>Restock now</strong>, <strong>Order more</strong>, or
+        <strong>Enough in stock</strong> — and separately decides whether a low-stock alert is raised.
+        Separately again, each tray gets an <strong>Urgency</strong> tag from its expiry date.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="box-t">The single most important idea</div>
+    <p class="mb0">The forecast and the stock check are two different questions. The forecast asks
+    <em>“how many eggs will I sell today?”</em> The verdict asks <em>“do I have that many?”</em>
+    A high forecast with low stock produces <strong>Restock now</strong>; a low forecast with plenty of
+    stock produces <strong>Enough in stock</strong>. Neither number alone means anything.</p>
+  </div>
+
+  <p class="note">
+    Every figure quoted in this document is read directly from the source files listed in Section&nbsp;08.
+    Where the code and its own comments disagree, the disagreement is recorded in Section&nbsp;09.
+  </p>
+
+</section>
+
+<!-- ============ 02 THRESHOLDS ============ -->
+<section id="s-thresholds">
+
+  <h2><span class="num">02</span>The five classifications &amp; their thresholds</h2>
+  <p class="lead">
+    Five separate labels are applied to stock and forecasts. They are computed in different files and
+    do not talk to each other, which is why their cut-off values differ. All values below are
+    hard-coded unless marked <span class="pill p-blue">configurable</span>.
+  </p>
+
+  <h3>2.1 &nbsp;Low Stock <span class="src">— classes/AlertManager.php:84</span></h3>
+  <p>
+    Raised as an alert on the dashboard. The idea is simple: <em>if what I have is less than a fixed
+    fraction of what I am likely to need, warn me.</em> The default fraction is one half.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:38%">Setting / condition</th><th style="width:26%">Value</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">low_stock_threshold</td><td class="v">0.5 <span class="pill p-blue">configurable</span></td><td>The ratio of supply to demand below which you are warned. Stored in <code>system_settings</code>.</td></tr>
+      <tr><td class="k">— clamped range</td><td class="v">0.1 – 1.0</td><td>Whatever is entered, the value is forced inside this range. 1.0 means “warn only when demand exceeds <em>all</em> your stock”.</td></tr>
+      <tr><td class="k">Reference demand</td><td class="v">last 7 days, else forecast</td><td>Prefer real sales from the previous 7 days. If a size had no sales, fall back to its average forecast for the last 7 days.</td></tr>
+      <tr><td class="k">Fires when — condition A</td><td class="v">stock = 0</td><td>Nothing left at all. Always fires, regardless of demand.</td></tr>
+      <tr><td class="k">Fires when — condition B</td><td class="v">stock &lt; demand × 0.5</td><td>You hold less than half of what is expected to move.</td></tr>
+      <tr><td class="k">Fires when — condition C</td><td class="v">stock &lt; recentSales × 0.5</td><td>Same idea, but benchmarked against what actually sold in the last 7 days.</td></tr>
+      <tr><td class="k">Severity — out of stock</td><td class="v"><span class="pill p-red">HIGH</span></td><td>Stock is zero. Message: “Out of stock — nothing left to sell”.</td></tr>
+      <tr><td class="k">Severity — low stock</td><td class="v"><span class="pill p-amber">MEDIUM</span></td><td>Stock is positive but under the ratio. Message states how many eggs are left and what they were compared against.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box">
+    <div class="box-t">Why alerts do not pile up</div>
+    <p class="mb0">Low-stock alerts are <strong>reconciled</strong>, not appended. Every run compares the
+    currently-true alerts against the alert table: anything still true is kept, anything no longer true is
+    marked resolved, and anything new is raised. One row per egg size, never one per tray.</p>
+  </div>
+
+  <h3>2.2 &nbsp;Sufficient Stock <span class="src">— pages/predictions.php:286</span></h3>
+  <p>
+    The green banner at the top of the Sales Forecast page. It is the <em>absence</em> of a shortage, so
+    its rule is a pair of conditions rather than a single number.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:38%">Condition</th><th style="width:26%">Value</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">No shortages</td><td class="v">list is empty</td><td>For every egg size with a forecast, <code>predicted_eggs − stock_eggs ≤ 0</code>.</td></tr>
+      <tr><td class="k">AND forecast is real</td><td class="v">totalTrays &gt; 0</td><td>Stops the banner claiming success when there is nothing to sell at all.</td></tr>
+      <tr><td class="k">Shortage definition</td><td class="v">shortage = max(0, predicted_eggs − stock_eggs)</td><td>Eggs, not trays. Negative results are floored at zero, so surplus never counts as a shortage.</td></tr>
+      <tr><td class="k">trays_to_buy</td><td class="v">ceil(shortage ÷ capacity)</td><td>Converted to whole trays to buy. Capacity is floored at 1 to avoid divide-by-zero.</td></tr>
+      <tr><td class="k">Ordering of the list</td><td class="v">largest shortage first</td><td>Sizes are sorted so the biggest gap appears at the top.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.3 &nbsp;Verdict — “Enough in stock” <span class="src">— includes/functions.php:294</span></h3>
+  <p>
+    One verdict per egg size, shown in the last column of the forecast table. It is computed from the
+    same shortage figure but reported as a single tone, then mapped to a phrase.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:20%">Verdict shown</th><th style="width:14%">Tone</th><th style="width:32%">Exact rule</th><th>Plain meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Restock now</strong></td>
+        <td><span class="pill p-red">danger</span></td>
+        <td class="k">stockEggs ≤ 0</td>
+        <td>You have none of this size. Nothing can be sold until you restock.</td>
+      </tr>
+      <tr>
+        <td><strong>Order more</strong></td>
+        <td><span class="pill p-amber">warning</span></td>
+        <td class="k">stockEggs &gt; 0 AND<br>predicted_eggs − stockEggs &gt; 0</td>
+        <td>You have some, but not enough to cover what is expected. The sentence states the shortfall.</td>
+      </tr>
+      <tr>
+        <td><strong>Enough in stock</strong></td>
+        <td><span class="pill p-green">success</span></td>
+        <td class="k">stockEggs − predicted_eggs ≥ 0</td>
+        <td>Stock covers the forecast. Any remainder is reported as spare eggs.</td>
+      </tr>
+      <tr>
+        <td>—</td>
+        <td><span class="pill p-gray">muted</span></td>
+        <td class="k">is_no_data = true</td>
+        <td>Too little sales history to forecast at all. Prompted to record a few days of sales.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="box warn">
+    <div class="box-t">The two green labels are not the same rule</div>
+    <p class="mb0"><strong>Sufficient Stock</strong> (the banner) is all-or-nothing across every size: if
+    even one size is short, the banner disappears. <strong>Enough in stock</strong> (the table column) is
+    judged per size. It is perfectly normal to see the banner absent while several rows still read
+    “Enough in stock”.</p>
+  </div>
+
+  <h3>2.4 &nbsp;Urgency <span class="src">— pages/picklist.php:40</span></h3>
+  <p>
+    A tag on every tray in the FIFO pick list. It answers <em>“how soon must this specific tray move?”</em>
+    and is based purely on dates, never on demand.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:18%">Tag</th><th style="width:20%">CSS class</th><th style="width:30%">Rule</th><th>Why it matters</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>EXPIRED</strong></td><td class="k">urgency-expired</td><td class="k">days_until_expiry &lt; 0</td><td>Past its expiry date. Greyed out — do not sell.</td></tr>
+      <tr><td><strong>SELL NOW</strong></td><td class="k">urgency-high</td><td class="k">days_until_expiry ≤ 3</td><td>Highest risk of waste. Pick first.</td></tr>
+      <tr><td><strong>USE SOON</strong></td><td class="k">urgency-medium</td><td class="k">days_until_expiry ≤ 7</td><td>Still sellable, but plan it into the week.</td></tr>
+      <tr><td><strong>AGING</strong></td><td class="k">urgency-low</td><td class="k">days_in_storage ≥ 14</td><td>Plenty of time left, but it has been sitting two weeks or more. Rotate it.</td></tr>
+      <tr><td>no tag</td><td class="k">(empty)</td><td class="k">otherwise</td><td>Fresh and comfortably within shelf life.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="note">
+    Rules are applied in order and the first match wins, so <span class="pill p-red">EXPIRED</span>
+    always beats the others, and <span class="pill p-green">AGING</span> can only appear once expiry is
+    more than 7 days away.
+  </p>
+
+  <p>
+    A second, separate set of expiry rules drives the dashboard <em>expiring</em> alerts. These use a
+    configurable look-ahead window rather than the fixed 3 / 7 day cut-offs above:
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:38%">Setting / condition</th><th style="width:26%">Value</th><th>Severity</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">alert_expiry_days</td><td class="v">3 <span class="pill p-blue">configurable</span>, minimum 1</td><td>Look-ahead window for scanning trays</td></tr>
+      <tr><td class="k">soonest &lt; 0</td><td class="v">already expired</td><td><span class="pill p-red">HIGH</span></td></tr>
+      <tr><td class="k">soonest = 0</td><td class="v">expires today</td><td><span class="pill p-red">HIGH</span></td></tr>
+      <tr><td class="k">soonest = 1</td><td class="v">1 day left</td><td><span class="pill p-red">HIGH</span></td></tr>
+      <tr><td class="k">soonest = 2 or 3</td><td class="v">inside the window</td><td><span class="pill p-amber">MEDIUM</span></td></tr>
+      <tr><td class="k">Grouping</td><td class="v">one row per egg size</td><td>Not one row per tray — 270 trays expiring together is one decision, not 270 pieces of news.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.5 &nbsp;Forecast Reliability</h3>
+  <p>
+    There is no single “reliability” number. Reliability is expressed twice: once as a
+    <strong>confidence level</strong> on each individual forecast, and once as an
+    <strong>accuracy gauge</strong> for the model as a whole. They answer different questions — “can I
+    trust <em>this</em> number?” versus “can I trust <em>the model</em> in general?”.
+  </p>
+
+  <h4>2.5a &nbsp;Confidence level — the “Sure” column <span class="src">— KNNPredictor.php:353</span></h4>
+  <p>
+    Driven purely by <em>how many past days the model had to learn from</em>. More history, more trust.
+    A stale size is automatically downgraded one step.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:20%">Level</th><th style="width:30%">Effective sample threshold</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="pill p-green">High</span></td><td class="k">≥ 30 days</td><td>A solid month-plus of history. Reasonable to plan stock around it.</td></tr>
+      <tr><td><span class="pill p-amber">Medium</span></td><td class="k">10 – 29 days</td><td>Enough to be directionally useful; expect misses of a tray or two.</td></tr>
+      <tr><td><span class="pill p-red">Low</span></td><td class="k">&lt; 10 days</td><td>Thin history. Treat the number as a rough guide.</td></tr>
+      <tr><td><span class="pill p-gray">None</span></td><td class="k">&lt; 7 rows of history</td><td>No forecast is produced at all. The page shows a prompt to record sales.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>The downgrade rule</h4>
+  <table>
+    <thead>
+      <tr><th style="width:38%">Setting / condition</th><th style="width:26%">Value</th><th>Effect</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">days_since_last_sale &gt; 30</td><td class="v">30 days</td><td>The size's own sales are too old to be representative.</td></tr>
+      <tr><td class="k">&rarr; effectiveSamples</td><td class="v">min(sampleCount, 8)</td><td>Capping at 8 forces the level to Low no matter how much history exists.</td></tr>
+      <tr><td class="k">UI signal</td><td class="v">“cut” + gap in days</td><td>The Sure column marks the badge as cut and shows how many days since that size last sold.</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    <strong>Why this exists:</strong> after a 30-day gap the 7-, 14- and 30-day demand windows all fall to
+    zero, so the model can only match on weekday. Sample count alone would still say “High”, which would
+    overstate how much the number is worth.
+  </p>
+
+  <h4>The confidence interval around the number</h4>
+  <table>
+    <thead>
+      <tr><th style="width:38%">Parameter</th><th style="width:26%">Value</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">Resamples</td><td class="v">100</td><td>Bootstrap rounds used to build the band.</td></tr>
+      <tr><td class="k">Percentiles used</td><td class="v">5th &amp; 95th</td><td>The band spans 90% of resampled outcomes.</td></tr>
+      <tr><td class="k">Minimum half-width</td><td class="v">0.5 trays</td><td>A band narrower than half a tray is widened to it — the model never claims false precision.</td></tr>
+      <tr><td class="k">n &lt; 5 fallback</td><td class="v">prediction × 0.5</td><td>Too few samples to bootstrap, so a crude 50% band is used instead.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>2.5b &nbsp;Accuracy gauge — model health <span class="src">— ModelEvaluator.php:253,310</span></h4>
+  <table>
+    <thead>
+      <tr><th style="width:26%">Band</th><th style="width:26%">Overall F1 score</th><th>Colour &amp; verdict</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Excellent</td><td class="k">≥ 90</td><td><span class="pill p-green">GREEN</span> Safe to plan stock around the forecast</td></tr>
+      <tr><td>Good</td><td class="k">80 – 89</td><td><span class="pill p-green">GREEN</span></td></tr>
+      <tr><td>Fair</td><td class="k">70 – 79</td><td><span class="pill p-amber">YELLOW</span> Watch it</td></tr>
+      <tr><td>Weak</td><td class="k">60 – 69</td><td><span class="pill p-amber">YELLOW</span></td></tr>
+      <tr><td>Poor</td><td class="k">&lt; 60</td><td><span class="pill p-red">RED</span> Retrain or reconsider</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    Individual metric rows use a coarser three-band rule against a <strong>90%</strong> target:
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:26%">Verdict</th><th style="width:26%">Metric band</th><th>Rule</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="pill p-green">Good</span></td><td class="k">≥ 90</td><td>Meets the target outright.</td></tr>
+      <tr><td><span class="pill p-amber">Watch</span></td><td class="k">76.5 – 89.9</td><td>85% of the target. Close enough to monitor, not to trust.</td></tr>
+      <tr><td><span class="pill p-red">Weak</span></td><td class="k">&lt; 76.5</td><td>Materially below target.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="note">
+    76.5 is not a typed-in number — it is <code>threshold × 0.85</code> = <code>90 × 0.85</code>. If the
+    target is ever changed, both boundaries move with it.
+  </p>
+
+  <h4>Automatic model-health alerts</h4>
+  <table>
+    <thead>
+      <tr><th style="width:34%">Metric</th><th style="width:22%">Alert below</th><th>Severity</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Accuracy</td><td class="k">&lt; 80%</td><td><span class="pill p-red">HIGH</span></td></tr>
+      <tr><td>Recall</td><td class="k">&lt; 80%</td><td><span class="pill p-red">HIGH</span></td></tr>
+      <tr><td>Precision</td><td class="k">&lt; 75%</td><td><span class="pill p-amber">MEDIUM</span></td></tr>
+      <tr><td>F1 score</td><td class="k">&lt; 75%</td><td><span class="pill p-amber">MEDIUM</span></td></tr>
+      <tr><td>Minimum samples</td><td class="k">≥ 5 required</td><td>Sizes with fewer scored days are skipped entirely.</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Source: <span class="src">AlertManager.php:151</span></p>
+
+  <h4>Data freshness banner</h4>
+  <p>
+    A separate global check runs before the per-size confidence, so the page can warn when
+    <em>no</em> size has recent sales. Because the predictor already downgrades per size, this banner does
+    not reduce confidence a second time — it only explains why.
+  </p>
+  <table>
+    <thead>
+      <tr><th style="width:22%">Label</th><th style="width:22%">Days since last sale</th><th>Wording</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="pill p-green">Up to date</span></td><td class="k">≤ 2</td><td>Nothing to flag.</td></tr>
+      <tr><td><span class="pill p-green">A few days behind</span></td><td class="k">3 – 7</td><td>Normal.</td></tr>
+      <tr><td><span class="pill p-amber">Behind by N days</span></td><td class="k">8 – 30</td><td>Recent demand windows still meaningful.</td></tr>
+      <tr><td><span class="pill p-red">Behind by N days</span></td><td class="k">&gt; 30</td><td>Forecast can only match on weekday. Banner shown; per-size confidence already cut.</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Source: <span class="src">pages/predictions.php:31–48</span></p>
+
+</section>
+
+<!-- ============ 03 INDEPENDENT ============ -->
+<section id="s-independent">
+
+  <h2><span class="num">03</span>Independent variables — the inputs</h2>
+  <p class="lead">
+    These are the things the model is allowed to <em>look at</em>. They are the independent variables: if
+    you changed one of them, the forecast would change. There are exactly <strong>seven</strong>, declared
+    in one place, and no others are used.
+  </p>
+
+  <div class="box">
+    <div class="box-t">The complete list</div>
+    <p class="mb0"><code>day_of_week</code> &nbsp;&#183;&nbsp; <code>is_weekend</code> &nbsp;&#183;&nbsp;
+    <code>is_holiday</code> &nbsp;&#183;&nbsp; <code>demand_7d</code> &nbsp;&#183;&nbsp;
+    <code>demand_14d</code> &nbsp;&#183;&nbsp; <code>demand_30d</code> &nbsp;&#183;&nbsp;
+    <code>demand_trend</code></p>
+  </div>
+
+  <p class="note">
+    <strong>Critically:</strong> no inventory variable is an input. Trays in stock, expiry dates and
+    quantity levels are deliberately excluded from the forecast so that the model predicts
+    <em>demand</em>, never <em>supply</em>. Stock only enters afterwards, when forming the verdict.
+  </p>
+
+  <h3>3.1 &nbsp;Calendar variables</h3>
+
+  <div class="feat">
+    <div class="feat-h">day_of_week</div>
+    <div class="feat-q">Which day of the week is it? For an egg shop, Saturday is not Tuesday.</div>
+    <p>PHP's <code>date('w')</code>, giving <strong>0 = Sunday through 6 = Saturday</strong>. This is
+    usually the single strongest signal: weekends carry heavier retail traffic than midweek.</p>
+    <p>It is stored in the database as 1–7 using <code>DAYOFWEEK()</code>, which subtracts 1 to realign it
+    with the 0–6 scale the model uses.</p>
+    <div class="feat-r">Range 0–6 &nbsp;&#183;&nbsp; Type: integer &nbsp;&#183;&nbsp; Source: target date</div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-h">is_weekend</div>
+    <div class="feat-q">Is today Saturday or Sunday?</div>
+    <p>Simply <code>1</code> when <code>day_of_week</code> is 0 or 6, otherwise <code>0</code>. This is
+    deliberately redundant with <code>day_of_week</code> — it is a derived convenience flag that makes the
+    weekend effect explicit in the distance calculation rather than something the model has to infer from
+    seven separate numeric distances.</p>
+    <p>Two features describing the same fact is a mild form of double-counting. It is kept because the
+    normalised distance for <code>day_of_week</code> treats “Sunday to Tuesday” as merely two steps away,
+    which understates how different they really are.</p>
+    <div class="feat-r">Range 0–1 &nbsp;&#183;&nbsp; Type: integer &nbsp;&#183;&nbsp; Derived from day_of_week</div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-h">is_holiday</div>
+    <div class="feat-q">Is today a Philippine public holiday?</div>
+    <p>Flag <code>1</code> if the date appears in the generated holiday list, otherwise <code>0</code>.
+    The list has two parts:</p>
+    <ul>
+      <li><strong>9 fixed dates</strong> — 1 Jan, 9 Apr, 1 May, 12 Jun, 21 Aug, 1 Nov, 30 Nov, 25 Dec, 30 Dec.</li>
+      <li><strong>3 movable dates</strong> — Maundy Thursday, Good Friday and Easter Sunday, all derived
+      from a computable Easter algorithm rather than a hard-coded calendar, so the dates are always right.</li>
+    </ul>
+    <p>Holiday egg sales behave differently enough to be worth flagging separately from “weekend”.</p>
+    <div class="feat-r">Range 0–1 &nbsp;&#183;&nbsp; Type: integer &nbsp;&#183;&nbsp; Source: <code>functions.php:170</code></div>
+  </div>
+
+  <h3>3.2 &nbsp;Demand-window variables</h3>
+  <p class="note">
+    All three use the same query: the <em>average trays sold per recorded day</em> over a window that ends
+    <strong>strictly before</strong> the target date. Two details matter. First, the window is
+    <code>date &lt; target</code>, so today's partial sales never leak into today's forecast. Second, it
+    averages over <em>recorded days</em>, not calendar days — so one quiet Tuesday does not drag the average
+    down as hard as it would under a calendar-day denominator. With <code>COALESCE(..., 0)</code>, a size
+    with no rows in the window returns <code>0</code> rather than <code>NULL</code>.
+  </p>
+
+  <div class="feat">
+    <div class="feat-h">demand_7d</div>
+    <div class="feat-q">On a typical recent day, how much did I sell?</div>
+    <p>Mean <code>trays_sold</code> across the previous 7 days. This is the model's main sense of
+    <em>current</em> demand level and typically carries the most weight in the distance calculation, because
+    it is the hardest of the seven features to accidentally match.</p>
+    <div class="feat-r">Unit: trays/day &nbsp;&#183;&nbsp; Type: float &nbsp;&#183;&nbsp; Window: 7 days</div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-h">demand_14d</div>
+    <div class="feat-q">What about the last two weeks?</div>
+    <p>The same average over 14 days. Where <code>demand_7d</code> is a fast read, this one is steadier and
+    partly smooths out a single unusual day. Where the two disagree, demand is either climbing or falling —
+    which is what the trend feature formalises.</p>
+    <div class="feat-r">Unit: trays/day &nbsp;&#183;&nbsp; Type: float &nbsp;&#183;&nbsp; Window: 14 days</div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-h">demand_30d</div>
+    <div class="feat-q">And over a full month?</div>
+    <p>The 30-day average. This is the slowest and most stable of the three. It is what keeps a fortnight of
+    unusually good trading from being read as a permanent new normal — a past day whose 30-day demand looks
+    nothing like the current month will correctly rank as a poor match.</p>
+    <div class="feat-r">Unit: trays/day &nbsp;&#183;&nbsp; Type: float &nbsp;&#183;&nbsp; Window: 30 days</div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-h">demand_trend</div>
+    <div class="feat-q">Is demand rising or falling? This week versus the week before.</div>
+    <p>Not a raw figure but a <strong>difference</strong>:</p>
+    <div class="calc">demand_trend = demand_7d  −  average(trays sold over days 8–14 ago)</div>
+    <p>Positive means this recent week beat the one before; negative means it fell short. Including the
+    slope as well as the level lets the model prefer a rising Tuesday over a flat one even when both average
+    the same number of trays.</p>
+    <div class="feat-r">Unit: trays/day difference &nbsp;&#183;&nbsp; Type: float &nbsp;&#183;&nbsp; Can be negative</div>
+  </div>
+
+  <h3>3.3 &nbsp;How the seven become a prediction</h3>
+  <p>
+    The seven features are only comparable because they are put on a common scale first. For every
+    training set, each feature's own minimum and maximum are recorded and every value is rescaled to fall
+    between 0 and 1. Without this, <code>day_of_week</code> (0–6) would dominate the arithmetic simply by
+    being numerically larger than <code>is_holiday</code> (0–1).
+  </p>
+
+  <div class="cols">
+    <div class="col">
+      <h4>Distance &amp; neighbour selection</h4>
+      <p>Each training day's normalised fingerprint is compared with today's by straight-line (Euclidean)
+      distance across all seven features — the square root of the summed squared gaps. Days are then sorted
+      by distance and the nearest <strong><em>k</em></strong> are kept.</p>
+    </div>
+    <div class="col">
+      <h4>Weighting &amp; averaging</h4>
+      <p>Each kept day gets a weight of <code>1/√distance</code>, multiplied by a recency factor of
+      <code>e^(−daysAgo / τ)</code>. The prediction is the weighted mean of those days' sales.</p>
+    </div>
+  </div>
+
+  <div class="box good">
+    <div class="box-t">Why 1/√distance instead of the textbook 1/distance</div>
+    <p class="mb0">Plain <code>1/d</code> collapses almost all the weight onto the single nearest day, so
+    <em>k</em> quietly behaves like “nearest 1” with extra steps and the vote of the other neighbours is lost.
+    <code>1/√d</code> still ranks nearer days first but lets the whole <em>k</em> window contribute. It is a
+    deliberate departure from the textbook formula.</p>
+  </div>
+
+  <h4>Supporting variables that are not features</h4>
+  <p>These shape the model but are not part of the distance calculation.</p>
+  <table>
+    <thead>
+      <tr><th style="width:26%">Variable</th><th style="width:26%">Value / range</th><th>Role</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">egg_size</td><td class="k">SS, SM, MD, LG,<br>XL, JB, CR, SA</td><td>Forecasts are entirely independent per size. Medium's history never informs Jumbo's.</td></tr>
+      <tr><td class="k">prediction_date</td><td class="k">YYYY-MM-DD</td><td>The day being predicted. The anchor for every window and for the strict “before” cut-off.</td></tr>
+      <tr><td class="k">k</td><td class="k">3, 5, 7 or 9</td><td>How many past days to average. Chosen per size by walk-forward test; forced to 3 below 14 history rows; default 5.</td></tr>
+      <tr><td class="k">tray_capacity</td><td class="k">24 or 30 eggs</td><td>Converts trays to eggs. Read per size from the database, falling back to 30.</td></tr>
+      <tr><td class="k">recency_tau (τ)</td><td class="k">45 days</td><td>Decay constant for the recency weight — the half-life of a day's influence. Overridable at runtime.</td></tr>
+      <tr><td class="k">training window</td><td class="k">365 days</td><td>Maximum history loaded per size, newest first.</td></tr>
+      <tr><td class="k">minimum history</td><td class="k">7 rows</td><td>Below this, no forecast is produced at all.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="note">
+    Note the two separate decay constants in the codebase: the live path uses <code>e^(−daysAgo/30)</code>
+    and the backtest path uses <code>e^(−daysAgo/τ)</code> with τ = 45. See Section&nbsp;09.
+  </p>
+
+</section>
+
+<!-- ============ 04 DEPENDENT ============ -->
+<section id="s-dependent">
+
+  <h2><span class="num">04</span>Dependent variables — the outputs</h2>
+  <p class="lead">
+    These are what the model produces. They depend on the seven inputs plus <em>k</em>. Unlike the inputs,
+    these are the numbers you actually see and act on.
+  </p>
+
+  <h3>4.1 &nbsp;The two primary targets</h3>
+  <p>
+    The model is run <strong>twice</strong> over the same days and the same neighbours, once for each target.
+    The two runs are independent — revenue is never calculated by multiplying a tray count by today's price.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:20%">Target</th><th style="width:26%">Fitted from</th><th>Output</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>actual_demand</strong></td>
+        <td class="k">sales_history.trays_sold</td>
+        <td>How many trays of this size will sell today.</td>
+      </tr>
+      <tr>
+        <td><strong>actual_sales</strong></td>
+        <td class="k">sales_history.total_amount</td>
+        <td>How much money this size will take today.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="box">
+    <div class="box-t">Why forecast revenue separately?</div>
+    <p class="mb0">Price changes over time and revenue per tray is not constant. Running a second pass over
+    the same historical days lets the model learn what revenue each size <em>actually</em> returned. The
+    consequence is deliberate and documented on the page: predicted sales will
+    <strong>not</strong> exactly equal eggs × today's price, and that is expected rather than a bug.</p>
+  </div>
+
+  <h3>4.2 &nbsp;Primary and derived outputs</h3>
+  <table>
+    <thead>
+      <tr><th style="width:24%">Output</th><th style="width:34%">How it is produced</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">predicted_trays</td><td>Weighted mean of the neighbours' <code>actual_demand</code>, rounded to a whole number.</td><td>The headline quantity. Clamped at ≥ 0.</td></tr>
+      <tr><td class="k">predicted_eggs</td><td class="k">round(predicted_trays × tray_capacity)</td><td>Derived from the <em>already-rounded</em> tray figure, not the raw one.</td></tr>
+      <tr><td class="k">predicted_sales</td><td>Second weighted-mean pass over <code>actual_sales</code>, to 2 dp.</td><td>Currency.</td></tr>
+      <tr><td class="k">confidence_lower</td><td class="k">prediction − interval</td><td>Floored at 0.</td></tr>
+      <tr><td class="k">confidence_upper</td><td class="k">prediction + interval</td><td>90% bootstrap band.</td></tr>
+      <tr><td class="k">confidence_level</td><td>Sample-count bands, after any staleness downgrade.</td><td>High / Medium / Low / None.</td></tr>
+      <tr><td class="k">confidence_raw_level</td><td>Same bands, before the downgrade.</td><td>Kept so the UI can show that a cut happened.</td></tr>
+      <tr><td class="k">confidence_downgraded</td><td class="k">true</code> if the two levels differ</td><td>Drives the “cut” note in the Sure column.</td></tr>
+      <tr><td class="k">k_used</td><td>Walk-forward winner.</td><td>Reported so the choice is auditable.</td></tr>
+      <tr><td class="k">samples_used</td><td>Count of training rows found.</td><td>Shown under the badge as “N days”.</td></tr>
+      <tr><td class="k">effective_neighbors</td><td>Kish's effective sample size from the weight shares.</td><td>Reveals when the weight has collapsed onto effectively one day. Values near 1.00 mean the <em>k</em> window is doing less work than it appears.</td></tr>
+      <tr><td class="k">days_since_last_sale</td><td>Days between the target and that size's most recent prior sale.</td><td>Drives the downgrade rule.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.3 &nbsp;Derived comparison variables</h3>
+  <p>These exist only to feed the verdict and the restock banner.</p>
+  <table>
+    <thead>
+      <tr><th style="width:30%">Variable</th><th style="width:36%">Formula</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">stock_eggs</td><td class="k">SUM(quantity) WHERE status = 'in_stock'</td><td>What is on the shelf now, per size.</td></tr>
+      <tr><td class="k">stock_trays</td><td class="k">COUNT(*) of in-stock trays</td><td>Shown as a secondary line under the egg count.</td></tr>
+      <tr><td class="k">shortage</td><td class="k">max(0, predicted_eggs − stock_eggs)</td><td>Gap in <strong>eggs</strong>. Non-positive means covered.</td></tr>
+      <tr><td class="k">surplus</td><td class="k">stock_eggs − predicted_eggs</td><td>Spare eggs, reported when positive.</td></tr>
+      <tr><td class="k">trays_to_buy</td><td class="k">ceil(shortage ÷ max(1, capacity))</td><td>Whole trays to order for that size.</td></tr>
+      <tr><td class="k">tone</td><td>Derived from stock_eggs and shortage.</td><td><span class="pill p-red">danger</span> / <span class="pill p-amber">warning</span> / <span class="pill p-green">success</span> / <span class="pill p-gray">muted</span></td></tr>
+      <tr><td class="k">total_trays / total_eggs / total_sales</td><td>Summed across sizes with forecast data.</td><td>The hero figures. Floats are summed first, then rounded once at the end.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box good">
+    <div class="box-t">The rounding rule that keeps totals honest</div>
+    <p class="mb0">Each size's tray figure is rounded <strong>once</strong>, then summed into its category
+    total, then summed into the day total. Previously each size was truncated to an integer as it was added
+    up, which lost up to a tray per size and made the visible totals disagree with each other. Eggs are always
+    trays × capacity, so the two figures can never contradict each other.</p>
+  </div>
+
+  <h3>4.4 &nbsp;No-data output</h3>
+  <p>
+    When fewer than 7 rows of history exist, the model refuses to guess. Rather than returning a misleading
+    zero, it returns a flagged empty result with the counts needed to fix the problem.
+  </p>
+  <table>
+    <thead>
+      <tr><th style="width:26%">Field</th><th style="width:26%">Value</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">is_no_data</td><td class="k">true</td><td>Suppresses every numeric output.</td></tr>
+      <tr><td class="k">predicted_trays / _eggs / _sales</td><td class="k">null</td><td>Rendered as an italic note, not as a 0.</td></tr>
+      <tr><td class="k">confidence_level</td><td class="k">none</td><td>Badge replaced with “Record sales”.</td></tr>
+      <tr><td class="k">message</td><td class="k">text</td><td>“No sales data available…” at 0 rows, or “Not enough data (N/7 samples)…” otherwise.</td></tr>
+      <tr><td class="k">samples_used</td><td class="k">count</td><td>How close the size is to the minimum.</td></tr>
+    </tbody>
+  </table>
+
+</section>
+
+<!-- ============ 05 STOCK VARIABLES ============ -->
+<section>
+
+  <h2><span class="num">05</span>Stock &amp; lifecycle variables</h2>
+  <p class="lead">
+    These variables are <strong>not</strong> model inputs — the forecast never sees them. They are read
+    straight from the inventory tables and used only by the threshold rules in Section&nbsp;02. Listing them
+    separately prevents the common mistake of treating them as predictive features.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:26%">Variable</th><th style="width:32%">Source</th><th>Used by</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">current_stock</td><td class="k">SUM(egg_trays.quantity) WHERE status='in_stock'</td><td>Low Stock, Verdict, Sufficient Stock</td></tr>
+      <tr><td class="k">tray_count</td><td class="k">COUNT of in-stock trays</td><td>Display under the egg figure</td></tr>
+      <tr><td class="k">tray_capacity</td><td class="k">egg_sizes.tray_capacity</td><td>Trays ↔ eggs conversion; shortage → trays to buy</td></tr>
+      <tr><td class="k">days_until_expiry</td><td class="k">DATEDIFF(expiry_date, today)</td><td>Urgency tag; expiring alerts</td></tr>
+      <tr><td class="k">days_in_storage</td><td class="k">DATEDIFF(today, production_date)</td><td>AGING urgency tag</td></tr>
+      <tr><td class="k">soonest</td><td class="k">MIN(DATEDIFF(expiry_date, NOW())) per size</td><td>Severity of the expiring alert</td></tr>
+      <tr><td class="k">recent_sold</td><td class="k">SUM(receipt_items.quantity), 7-day, non-voided</td><td>Low Stock reference demand</td></tr>
+      <tr><td class="k">avg_predicted_eggs</td><td class="k">AVG(predicted_trays) × capacity, 7-day</td><td>Low Stock fallback reference demand</td></tr>
+      <tr><td class="k">status</td><td class="k">in_stock / sold / damaged / discarded / deleted</td><td>Every stock figure filters on this</td></tr>
+      <tr><td class="k">fifo_priority_score</td><td class="k">egg_trays column</td><td>Pick-list ordering</td></tr>
+      <tr><td class="k">shelf_life</td><td class="k">egg_sizes.shelf_life (3–45 days)</td><td>Source of expiry dates</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box warn">
+    <div class="box-t">The most important structural decision</div>
+    <p class="mb0">Forecast and stock are kept strictly apart. A bug in stock tracking can therefore never
+    silently corrupt the model, and the backtest scores can never be inflated by the model's own output being
+    written back as “actual”. This separation is what makes the accuracy figures trustworthy.</p>
+  </div>
+
+</section>
+
+<!-- ============ 06 EVALUATION ============ -->
+<section>
+
+  <h2><span class="num">06</span>Evaluation variables</h2>
+  <p class="lead">
+    These are also dependent variables — they depend on the model's predictions — but they are computed
+    afterwards, by replaying the forecast over real past days. They tell you how much the whole system is
+    worth trusting.
+  </p>
+
+  <div class="box good">
+    <div class="box-t">Scored by backtest, not by reading stored rows</div>
+    <p class="mb0">Metrics come from replaying the forecast across past days, where each day is predicted
+    using <strong>only days before it</strong>. The stored <code>knn_predictions</code> table is never used as
+    the scoring source, because it can be seeded, stale, or partly written by a cron job — and because the
+    model itself writes to it. Anything less than 5 scored days returns an empty result set.</p>
+  </div>
+
+  <h3>6.1 &nbsp;Tolerance metrics <span class="pill p-blue">closeness</span></h3>
+  <table>
+    <thead>
+      <tr><th style="width:24%">Metric</th><th style="width:32%">Formula</th><th>What it means</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">accuracy</td><td class="k">(days within ±1 tray ÷ total) × 100</td><td>Hit rate. One tray is accepted as a miss-free day because a hand-counted tray is rarely exact.</td></tr>
+      <tr><td class="k">exact_accuracy</td><td class="k">(days within ±0.5 tray ÷ total) × 100</td><td>Stricter version — effectively an exact match on the rounded tray count.</td></tr>
+      <tr><td class="k">over_predicted</td><td class="k">count where (predicted − actual) &gt; 0.5</td><td>Days the model guessed too high.</td></tr>
+      <tr><td class="k">under_predicted</td><td class="k">count where (predicted − actual) &lt; −0.5</td><td>Days the model guessed too low.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6.2 &nbsp;Directional metrics <span class="pill p-blue">bias, not closeness</span></h3>
+  <table>
+    <thead>
+      <tr><th style="width:24%">Metric</th><th style="width:32%">Formula</th><th>What it means</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">precision</td><td class="k">((total − over_predicted) ÷ total) × 100</td><td><strong>Guards your cash.</strong> Share of days the model did not over-predict. Over-forecasting ties up money in stock that then ages.</td></tr>
+      <tr><td class="k">recall</td><td class="k">((total − under_predicted) ÷ total) × 100</td><td><strong>Guards your sales.</strong> Share of days the model reached at least the actual figure. Under-forecasting turns customers away.</td></tr>
+      <tr><td class="k">f1_score</td><td class="k">2 × (P × R) ÷ (P + R)</td><td>Harmonic mean. Falls sharply when <em>either</em> direction is unhealthy, which is why it is used for the headline gauge.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box warn">
+    <div class="box-t">These are not classical precision and recall</div>
+    <p class="mb0">There is no true/false-positive matrix here. Both figures reduce to the
+    <strong>sign</strong> of <code>(predicted − actual)</code> against a ±0.5-tray cut, so they measure
+    <em>directional bias</em>, not classification quality. They are still useful — a model that is
+    consistently 2 trays high will score badly on precision even if its average error is small — but the
+    conventional textbook definitions do not apply. The page states this explicitly in its own footnote.</p>
+  </div>
+
+  <h3>6.3 &nbsp;Error metrics <span class="pill p-blue">magnitude</span></h3>
+  <table>
+    <thead>
+      <tr><th style="width:24%">Metric</th><th style="width:32%">Formula</th><th>What it means</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">mae</td><td class="k">mean(|actual − predicted|)</td><td>Average miss in trays. The most readable of the error figures.</td></tr>
+      <tr><td class="k">mse</td><td class="k">mean((actual − predicted)²)</td><td>Squares the errors, so outliers dominate.</td></tr>
+      <tr><td class="k">rmse</td><td class="k">√mse</td><td>Same units as MAE, outlier-sensitive. Drives the “Worst-Day Miss” figure.</td></tr>
+      <tr><td class="k">mape</td><td class="k">mean(|error| ÷ actual) × 100</td><td>Percentage error. Skipped whenever actual is 0.</td></tr>
+      <tr><td class="k">r2</td><td class="k">1 − (Σresidual² ÷ Σtotal²)</td><td>Share of day-to-day variation explained. Bands: ≥0.75 green, ≥0.50 yellow, else red.</td></tr>
+      <tr><td class="k">adj_r2</td><td class="k">r2 penalised for 7 features</td><td>Adjusted R². Falls back to plain r2 when there are too few samples (&lt; 8).</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6.4 &nbsp;Bookkeeping variables</h3>
+  <table>
+    <thead>
+      <tr><th style="width:28%">Variable</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">sample_count</td><td>Number of scored size-by-day checks. Runs several times higher than the number of calendar days, since every size is scored every day.</td></tr>
+      <tr><td class="k">confusion_matrix</td><td>Bundle of within_tolerance, exact_match, over_predicted, under_predicted, total.</td></tr>
+      <tr><td class="k">evaluation_window</td><td>First and last scored date. Feeds the “between X and Y” wording.</td></tr>
+      <tr><td class="k">evaluation_source</td><td>Always <code>walk_forward_backtest</code>.</td></tr>
+      <tr><td class="k">calculation_formula</td><td>The arithmetic written out in full, shown per size on request.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="box">
+    <div class="box-t">Why the headline gauge uses F1, not accuracy</div>
+    <p class="mb0">Accuracy on its own is misleading here, because the ±1-tray tolerance is generous. A model
+    that is systematically short can post a very high accuracy while its recall sits near 50%. F1 falls when
+    either direction is unhealthy, so it is the safer single number to headline. Accuracy is still reported
+    alongside it.</p>
+  </div>
+
+</section>
+
+<!-- ============ 07 WORKED EXAMPLES ============ -->
+<section id="s-examples">
+
+  <h2><span class="num">07</span>Worked examples</h2>
+  <p class="lead">The same numbers pushed through each rule by hand, to check the thresholds behave as documented.</p>
+
+  <h3>7.1 &nbsp;A forecast, from raw neighbours to eggs</h3>
+  <p class="note">Medium (MD) today. Tray capacity 30. The three nearest past days were:</p>
+  <table>
+    <thead>
+      <tr><th>Past day</th><th class="num">Distance</th><th class="num">1/√d</th><th class="num">Recency e^(−d/τ)</th><th class="num">Weight</th><th class="num">Trays sold</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>3 days ago</td><td class="num">0.05</td><td class="num">4.47</td><td class="num">0.936</td><td class="num">4.18</td><td class="num">7</td></tr>
+      <tr><td>10 days ago</td><td class="num">0.40</td><td class="num">1.58</td><td class="num">0.801</td><td class="num">1.27</td><td class="num">5</td></tr>
+      <tr><td>24 days ago</td><td class="num">0.90</td><td class="num">1.05</td><td class="num">0.587</td><td class="num">0.62</td><td class="num">4</td></tr>
+    </tbody>
+  </table>
+  <div class="calc">weightedSum   = 4.18×7 + 1.27×5 + 0.62×4 = 29.26 + 6.35 + 2.48 = <b>38.09</b>
+weightTotal  = 4.18 + 1.27 + 0.62                              = <b>6.07</b>
+
+predicted_trays = round(38.09 ÷ 6.07) = round(6.28)      = <b>6 trays</b>
+predicted_eggs  = round(6 × 30)                          = <b>180 eggs</b></div>
+  <p class="note">
+    Note the rounding order: eggs come from the <em>rounded</em> tray count. Deriving eggs from the raw
+    6.28 would give 188 eggs, producing the impossible pairing of “6 trays / 188 eggs” for a 30-egg tray.
+  </p>
+
+  <h3>7.2 &nbsp;Confidence level and the staleness cut</h3>
+  <div class="calc">Scenario A — Medium has <b>42</b> days of history, last sale 5 days ago
+  effectiveSamples = 42  →  ≥ 30  →  <b>HIGH</b>          (no cut)
+
+Scenario B — Medium has <b>42</b> days of history, last sale <b>44 days ago</b>
+  gapDays = 44 > 30  →  effectiveSamples = min(42, 8) = 8
+  8 < 10  →  <b>LOW</b>                              (cut from High)
+  confidence_raw_level = HIGH  →  the "cut" note appears, showing "44d since last sale"
+
+Scenario C — Medium has <b>5</b> days of history
+  5 < 7  →  no forecast at all  →  confidence_level = <b>NONE</b>, is_no_data = true</div>
+  <p class="note">
+    Scenario B is the important one: the size has <em>plenty</em> of history, but all of it is too old to be
+    representative, so the badge is cut anyway.
+  </p>
+
+  <h3>7.3 &nbsp;Verdict and the banner</h3>
+  <table>
+    <thead>
+      <tr><th>Size</th><th class="num">Predicted eggs</th><th class="num">In stock</th><th class="num">Shortage</th><th>Verdict</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Medium</td><td class="num">180</td><td class="num">240</td><td class="num">0</td><td><span class="pill p-green">Enough in stock</span> <span class="note">60 spare</span></td></tr>
+      <tr><td>Large</td><td class="num">300</td><td class="num">210</td><td class="num">90</td><td><span class="pill p-amber">Order more</span> <span class="note">3 trays to buy</span></td></tr>
+      <tr><td>Jumbo</td><td class="num">48</td><td class="num">0</td><td class="num">48</td><td><span class="pill p-red">Restock now</span></td></tr>
+    </tbody>
+  </table>
+  <p class="note">
+    Banner outcome: <strong>“Restock before you sell”</strong> — not “Stock looks sufficient”, because the
+    banner requires zero shortages across <em>every</em> size, and two sizes are short. This is the
+    difference between the banner and the column.
+  </p>
+
+  <h3>7.4 &nbsp;Low Stock with a custom threshold</h3>
+  <div class="calc">Salted (SA): in stock 150 eggs · sold 400 eggs in the last 7 days
+
+default 0.5 →  400 × 0.5 = 200  →  150 &lt; 200  →  <b>LOW STOCK, medium</b>
+threshold 0.7 →  400 × 0.7 = 280  →  150 &lt; 280  →  <b>LOW STOCK, medium</b>
+threshold 0.3 →  400 × 0.3 = 120  →  150 &gt; 120  →  <b>no alert</b>
+
+No sales in 7 days → falls back to forecast: 180 eggs × 0.5 = 90 → 150 &gt; 90 → <b>no alert</b></div>
+
+  <h3>7.5 &nbsp;Urgency from two dates</h3>
+  <table>
+    <thead>
+      <tr><th>Tray</th><th>Produced</th><th>Expires</th><th class="num">Days to expiry</th><th class="num">Days in storage</th><th>Tag</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>A</td><td>1 Jun</td><td>10 Jun</td><td class="num">−2</td><td class="num">4</td><td><span class="pill p-gray">EXPIRED</span></td></tr>
+      <tr><td>B</td><td>20 May</td><td>8 Jun</td><td class="num">3</td><td class="num">14</td><td><span class="pill p-red">SELL NOW</span></td></tr>
+      <tr><td>C</td><td>20 May</td><td>13 Jun</td><td class="num">8</td><td class="num">14</td><td><span class="pill p-green">AGING</span></td></tr>
+      <tr><td>D</td><td>5 Jun</td><td>26 Jun</td><td class="num">21</td><td class="num">8</td><td>no tag</td></tr>
+    </tbody>
+  </table>
+  <p class="note">
+    Trays B and C are the instructive pair: identical age in storage, but B expires in 3 days so the
+    <em>expiry</em> rule fires first. Age only decides the tag once expiry is more than 7 days away.
+  </p>
+
+  <h3>7.6 &nbsp;Metric status boundaries</h3>
+  <div class="calc">Measured F1 = 91.0%   →  ≥ 90.0  →  <b>GREEN — Good</b>
+Measured F1 = 89.9%   →  &lt; 90.0 but ≥ 76.5  →  <b>YELLOW — Watch</b>
+Measured F1 = 76.5%   →  exactly at the boundary  →  <b>YELLOW — Watch</b>
+Measured F1 = 76.4%   →  below 76.5  →  <b>RED — Weak</b>
+Measured F1 = 45.0%   →  gauge band "Poor", colour <b>RED</b>
+Measured F1 = 0 samples →  <b>grey — insufficient data</b></div>
+
+  <h3>7.7 &nbsp;Accuracy on a single backtested day</h3>
+  <div class="calc">Actual sold 6 trays · predicted 5 trays
+  error = 1  →  within ±1 tray  →  accuracy counts this day as a hit
+  within ±0.5? No → counts as an over/under day (under, by 1 tray)
+
+Actual sold 6 trays · predicted 7 trays
+  error = 1  →  hit on accuracy, but sign is positive → <b>over-predicted</b> → costs precision
+
+Actual sold 0 trays · predicted 2 trays
+  error = 2  →  miss on accuracy, over-predicted → costs precision
+  mape skips this day (division by zero protected)</div>
+
+</section>
+
+<!-- ============ 08 REFERENCE ============ -->
+<section>
+
+  <h2><span class="num">08</span>Reference data &amp; code map</h2>
+
+  <h3>8.1 &nbsp;Egg sizes <span class="src">— egg_sizes</span></h3>
+  <table>
+    <thead>
+      <tr><th>Code</th><th>Label</th><th class="num">Capacity</th><th class="num">Price / tray</th><th class="num">Price / egg</th><th class="num">Shelf life</th><th>Category</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">SS</td><td>Super Small</td><td class="num">30</td><td class="num">₱180.00</td><td class="num">₱6.00</td><td class="num">21 days</td><td>fresh</td></tr>
+      <tr><td class="k">SM</td><td>Small</td><td class="num">30</td><td class="num">₱210.00</td><td class="num">₱7.00</td><td class="num">21 days</td><td>fresh</td></tr>
+      <tr><td class="k">MD</td><td>Medium</td><td class="num">30</td><td class="num">₱240.00</td><td class="num">₱8.00</td><td class="num">21 days</td><td>fresh</td></tr>
+      <tr><td class="k">LG</td><td>Large</td><td class="num">30</td><td class="num">₱270.00</td><td class="num">₱9.00</td><td class="num">21 days</td><td>fresh</td></tr>
+      <tr><td class="k">XL</td><td>Extra Large</td><td class="num">24</td><td class="num">₱240.00</td><td class="num">₱10.00</td><td class="num">21 days</td><td>fresh</td></tr>
+      <tr><td class="k">JB</td><td>Jumbo</td><td class="num">24</td><td class="num">₱288.00</td><td class="num">₱12.00</td><td class="num">21 days</td><td>fresh</td></tr>
+      <tr><td class="k">SA</td><td>Salted</td><td class="num">30</td><td class="num">₱360.00</td><td class="num">₱12.00</td><td class="num">45 days</td><td>salted</td></tr>
+    </tbody>
+  </table>
+  <p class="note">
+    Tray capacity is <strong>not uniform</strong> — XL and JB hold 24 eggs while the rest hold 30. Any code
+    that assumes 30 eggs per tray is wrong for those two sizes. The application falls back to 30 when a size
+    has no capacity recorded.
+  </p>
+
+  <h3>8.2 &nbsp;Configurable settings <span class="src">— system_settings</span></h3>
+  <table>
+    <thead>
+      <tr><th style="width:30%">Key</th><th style="width:16%">Default</th><th>Effect</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="k">low_stock_threshold</td><td class="k">0.5</td><td>Supply-to-demand ratio below which Low Stock fires. Clamped 0.1–1.0.</td></tr>
+      <tr><td class="k">alert_expiry_days</td><td class="k">3</td><td>Look-ahead window for expiry scanning. Minimum 1.</td></tr>
+      <tr><td class="k">auto_retrain</td><td class="k">1</td><td>Whether the weekly retrain runs automatically. Checked on every forecast read.</td></tr>
+      <tr><td class="k">timezone</td><td class="k">Asia/Manila</td><td>All date arithmetic.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.3 &nbsp;Where each rule lives</h3>
+  <table>
+    <thead>
+      <tr><th style="width:34%">Rule</th><th>Location</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Feature list (the 7 inputs)</td><td class="k">KNNPredictor.php:25</td></tr>
+      <tr><td>Feature extraction</td><td class="k">KNNPredictor.php:103</td></tr>
+      <tr><td>Demand window queries</td><td class="k">KNNPredictor.php:125, 134</td></tr>
+      <tr><td>Min-max normalisation</td><td class="k">KNNPredictor.php:172</td></tr>
+      <tr><td>Weighted KNN (live)</td><td class="k">KNNPredictor.php:184</td></tr>
+      <tr><td>Weighted KNN (backtest)</td><td class="k">KNNPredictor.php:817</td></tr>
+      <tr><td>Euclidean distance</td><td class="k">KNNPredictor.php:235</td></tr>
+      <tr><td>k selection (3/5/7/9)</td><td class="k">KNNPredictor.php:262</td></tr>
+      <tr><td>Walk-forward validation</td><td class="k">KNNPredictor.php:298</td></tr>
+      <tr><td>Bootstrap confidence band</td><td class="k">KNNPredictor.php:327</td></tr>
+      <tr><td>Confidence level bands</td><td class="k">KNNPredictor.php:353</td></tr>
+      <tr><td>Staleness downgrade</td><td class="k">KNNPredictor.php:56</td></tr>
+      <tr><td>No-data result</td><td class="k">KNNPredictor.php:359</td></tr>
+      <tr><td>Backtest series</td><td class="k">KNNPredictor.php:624</td></tr>
+      <tr><td>Egg → tray conversion</td><td class="k">KNNPredictor.php:70, 1018</td></tr>
+      <tr><td>All backtest metrics</td><td class="k">ModelEvaluator.php:61</td></tr>
+      <tr><td>Accuracy / precision / recall / F1</td><td class="k">ModelEvaluator.php:143–151</td></tr>
+      <tr><td>R² and adjusted R²</td><td class="k">ModelEvaluator.php:99–120</td></tr>
+      <tr><td>Overall gauge bands</td><td class="k">ModelEvaluator.php:310</td></tr>
+      <tr><td>Metric status bands</td><td class="k">ModelEvaluator.php:253 / functions.php:278</td></tr>
+      <tr><td>Low Stock rule</td><td class="k">AlertManager.php:84</td></tr>
+      <tr><td>Expiring alert severity</td><td class="k">AlertManager.php:30</td></tr>
+      <tr><td>Model-health thresholds</td><td class="k">AlertManager.php:151</td></tr>
+      <tr><td>Verdict text</td><td class="k">functions.php:294</td></tr>
+      <tr><td>PH holiday calendar</td><td class="k">functions.php:170</td></tr>
+      <tr><td>Freshness banner</td><td class="k">pages/predictions.php:31</td></tr>
+      <tr><td>Sufficient Stock banner</td><td class="k">pages/predictions.php:286</td></tr>
+      <tr><td>Urgency tags</td><td class="k">pages/picklist.php:40</td></tr>
+    </tbody>
+  </table>
+
+</section>
+
+<!-- ============ 09 CAVEATS ============ -->
+<section>
+
+  <h2><span class="num">09</span>Caveats &amp; inconsistencies</h2>
+  <p class="lead">
+    Three places where the code does not fully agree with itself. None breaks the system today, but each one
+    is worth knowing before a number is treated as authoritative.
+  </p>
+
+  <div class="box warn avoid">
+    <div class="box-t">1 &nbsp;Two different confidence-band rules exist</div>
+    <p>
+      The canonical <code>getConfidenceLevel()</code> uses <strong>≥30 → High, ≥10 → Medium, else Low</strong>,
+      and this is what the live forecast and the Sure column use.
+    </p>
+    <p>
+      A separate inline rule elsewhere in the same file uses <strong>≥30 → High, ≥14 → Medium, else Low</strong>
+      when writing confidence during retraining.
+    </p>
+    <p class="mb0">
+      <strong>Effect:</strong> a size with 10–13 history days can display <em>Medium</em> on the forecast page
+      while having been persisted as <em>Low</em>. The displayed value is the more generous of the two. The two
+      should be reconciled to one shared function.
+    </p>
+  </div>
+
+  <div class="box warn avoid">
+    <div class="box-t">2 &nbsp;Two different recency decay constants exist</div>
+    <p>
+      The live prediction path decays by <code>e^(−daysAgo/30)</code>, giving a 30-day time constant.
+      The backtest path uses <code>e^(−daysAgo/τ)</code> with <strong>τ = 45</strong>, overridable via
+      <code>setRecencyTau()</code>.
+    </p>
+    <p class="mb0">
+      <strong>Effect:</strong> the live forecast and the backtest that grades it weight recency differently.
+      The reported accuracy therefore measures a slightly different model from the one that produces the daily
+      number. Using one constant in both places would make the score strictly honest.
+    </p>
+  </div>
+
+  <div class="box warn avoid">
+    <div class="box-t">3 &nbsp;Precision and recall are sign tests, not classification scores</div>
+    <p>
+      As covered in Section&nbsp;06.2, both reduce to the sign of the error against a ±0.5-tray cut. A model
+      that over-predicts every single day by one tray would score <strong>0% precision</strong> while having a
+      perfectly respectable hit rate — which is informative, but is not what the textbook terms imply to
+      anyone reading the table without the footnote.
+    </p>
+    <p class="mb0">
+      <strong>Recommendation:</strong> keep the metrics, but consider renaming them to
+      “Did not over-predict” / “Did not under-predict” everywhere, so the label and the maths agree.
+    </p>
+  </div>
+
+  <h3>Lower-risk observations</h3>
+  <ul>
+    <li>
+      <strong><code>is_weekend</code> duplicates <code>day_of_week</code>.</strong> Both contribute to the
+      distance, so weekends are effectively weighted double. Defensible as an explicit interaction term, but it
+      is undocumented as one.
+    </li>
+    <li>
+      <strong>No minimum sample count for <code>metricStatus()</code> or the gauge bands.</strong> A size with
+      5 scored days at 100% shows the same green as one with 200 scored days at 90%. The
+      <code>sample_count ≥ 5</code> filter exists for model-health alerts but not for the on-page metric rows.
+    </li>
+    <li>
+      <strong>Forecast page shows one global staleness banner but per-size confidence.</strong> These are two
+      separate mechanisms. The banner is global (any sales activity at all), the downgrade is per size. The
+      page correctly avoids double-counting, but the two can disagree on screen.
+    </li>
+    <li>
+      <strong>Low Stock compares against a 7-day average forecast</strong> when a size had no sales, which can
+      alert on a size the model itself rates Low confidence. The message does not surface the confidence level.
+    </li>
+  </ul>
+
+  <div class="box good avoid" style="margin-top:6mm">
+    <div class="box-t">What the design gets right</div>
+    <p>Three decisions are worth protecting in any future change, because each one fixes a real failure mode:</p>
+    <ol class="mb0">
+      <li><strong>Forecast and stock are fully separated.</strong> Stock levels never enter the model, so
+      inventory bugs cannot silently corrupt demand predictions.</li>
+      <li><strong>Metrics are scored by walk-forward backtest, not from stored rows.</strong> The model can
+      never be graded against a figure it helped produce.</li>
+      <li><strong>Confidence is downgraded on staleness, not just sample count.</strong> Plenty of old data is
+      treated as worse than a modest amount of fresh data, which is the honest relationship.</li>
+    </ol>
+  </div>
+
+  <div class="legend">
+    Thresholds transcribed from source on the date shown on the cover. Behaviour at exact boundary values is
+    noted where the comparison operator is inclusive.
+  </div>
+
+</section>
+
+</body>
+</html>

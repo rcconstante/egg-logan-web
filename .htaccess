@@ -1,0 +1,30 @@
+RewriteEngine On
+RewriteBase /Egglogan/
+
+# Deny access to sensitive files and directories
+RewriteRule ^config/ - [F,L]
+RewriteRule ^includes/ - [F,L]
+RewriteRule ^classes/ - [F,L]
+RewriteRule ^backups/ - [F,L]
+RewriteRule \.(sql|log|env|bak)$ - [F,L]
+
+# Pretty URLs for verification
+RewriteRule ^verify/tray/(.*)$ verify/index.php?type=tray&id=$1 [L,QSA]
+RewriteRule ^verify/(.*)$ verify/index.php?type=receipt&id=$1 [L,QSA]
+
+# Deny access to hidden files
+RewriteRule "(^|/)\.(?!well-known)" - [F]
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# PHP settings
+php_value upload_max_filesize 20M
+php_value post_max_size 25M
+php_value max_execution_time 300
+php_value max_input_time 300

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Low Stock Alerts &mdash; Plain Language Guide</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm; }
+
+  :root{
+    --ink:#1a1a1a; --ink-2:#4a4a4a; --ink-3:#767676;
+    --rule:#d8d2c4; --rule-2:#ebe6da; --bg:#faf8f3;
+    --accent:#8a5a2b;
+    --green:#1B6B47; --green-bg:#DFF0E5;
+    --amber:#9A6A0B; --amber-bg:#FCF3DE;
+    --red:#A93226;   --red-bg:#FBE4E0;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+
+  body{
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    font-size:10.6pt; line-height:1.5; color:var(--ink); margin:0; background:#fff;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead{ border-top:4px solid var(--ink); padding-top:4mm; margin-bottom:5mm; }
+  .eyebrow{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8.5pt; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--accent); font-weight:700; margin:0 0 3mm;
+  }
+  h1{ font-size:23pt; line-height:1.12; margin:0 0 3mm; font-weight:600; letter-spacing:-.015em; }
+  .standfirst{ font-size:11.5pt; line-height:1.5; color:var(--ink-2); margin:0; max-width:150mm; }
+
+  /* ---------- The one big idea ---------- */
+  .bigidea{ border:2px solid var(--accent); background:var(--bg); padding:5mm; margin:0 0 5mm; text-align:center; }
+  .bigidea .lead-in{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8.5pt; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 2.5mm;
+  }
+  .bigidea .line{ font-size:18pt; font-weight:600; line-height:1.3; margin:0 0 2.5mm; letter-spacing:-.01em; }
+  .bigidea .sub{ font-size:11pt; color:var(--ink-2); margin:0; }
+
+  /* ---------- Sections ---------- */
+  h2{
+    font-size:13pt; margin:0 0 2.5mm; font-weight:600;
+    padding-bottom:1.8mm; border-bottom:2px solid var(--ink);
+  }
+  h2 .n{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:9pt; color:var(--accent); font-weight:700; margin-right:3mm; letter-spacing:.05em;
+  }
+  section{ margin-bottom:5mm; }
+  p{ margin:0 0 2.4mm; }
+
+  /* ---------- Calc blocks ---------- */
+  .calc{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:9.8pt; background:var(--bg); border:1px solid var(--rule-2);
+    padding:3.2mm 4mm; line-height:1.5; margin:0 0 3mm; color:#3d3d3d; white-space:pre-wrap;
+  }
+  .calc b{ color:var(--accent); }
+  .rule{ color:#a8a29a; }
+
+  /* ---------- Tables ---------- */
+  table{ width:100%; border-collapse:collapse; margin:0 0 3mm; font-size:10pt; }
+  th{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:7.6pt; text-transform:uppercase; letter-spacing:.07em; font-weight:700;
+    text-align:left; padding:2mm 2.6mm; background:#f4ece0; color:#4a3418;
+    border-bottom:1px solid var(--rule);
+  }
+  td{ padding:2mm 2.6mm; border-bottom:1px solid var(--rule-2); vertical-align:top; line-height:1.4; }
+  tbody tr:nth-child(even) td{ background:#fcfbf7; }
+  td.v{ font-weight:650; white-space:nowrap; }
+  td.n{ text-align:right; white-space:nowrap; }
+  .you td{ background:#fdf6e8 !important; font-weight:600; }
+  .you td:first-child{ box-shadow:inset 3px 0 0 var(--accent); }
+
+  /* ---------- Callouts ---------- */
+  .box{ border:1px solid var(--rule); border-left:3px solid var(--accent);
+        background:var(--bg); padding:3.2mm 4mm; margin:0 0 3mm; }
+  .box.ok{ border-left-color:var(--green); background:#f2f9f5; }
+  .box-t{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8.5pt; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+    margin:0 0 1.6mm; color:var(--accent);
+  }
+  .box.ok .box-t{ color:var(--green); }
+  .box p:last-child{ margin-bottom:0; }
+  .sample{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+    font-size:8.8pt; line-height:1.65; margin:0; color:#3d3d3d;
+  }
+
+  /* ---------- Pills ---------- */
+  .pill{
+    display:inline-block; font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8pt; font-weight:700; padding:.6mm 2.2mm; border-radius:2.5px; white-space:nowrap;
+  }
+  .p-red{ background:var(--red-bg); color:var(--red); }
+
+  /* ---------- Steps ---------- */
+  .step{ display:flex; gap:3.5mm; padding:2.2mm 0; border-bottom:1px dashed var(--rule); }
+  .step:last-child{ border-bottom:none; }
+  .dot{
+    flex:0 0 7.5mm; height:7.5mm; border-radius:50%; background:var(--accent); color:#fff;
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8.5pt; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+  .stepbody{ flex:1; }
+  .st{ font-weight:650; margin-bottom:.6mm; }
+  .sd{ font-size:10.2pt; color:var(--ink-2); }
+
+  /* ---------- Remember box ---------- */
+  .remember{ border:2.5px solid var(--ink); padding:4.5mm 5mm; margin:0 0 4mm; background:#fff; }
+  .remember .rl{
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8.5pt; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 2mm;
+  }
+  .remember .rt{ font-size:13pt; line-height:1.45; margin:0; }
+
+  .foot{
+    border-top:1px solid var(--rule); margin-top:4mm; padding-top:2.5mm;
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Arial,sans-serif;
+    font-size:8.5pt; color:var(--ink-3);
+  }
+  code{
+    font-family:ui-monospace,"Cascadia Mono",Consolas,monospace; font-size:9.6pt;
+    background:var(--bg); border:1px solid var(--rule-2); padding:.4mm 1.4mm; border-radius:2px;
+    color:#5a3a18; white-space:nowrap;
+  }
+  ol{ margin:0 0 2.4mm; padding-left:6mm; }
+  li{ margin-bottom:1.2mm; }
+  .pagebreak{ page-break-before:always; }
+  .avoid{ page-break-inside:avoid; }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <p class="eyebrow">EggLogan Egg Storage &middot; Plain Language Guide</p>
+  <h1>Understanding Your<br>&ldquo;Low Stock&rdquo; Alerts</h1>
+  <p class="standfirst">
+    No formulas, no jargon. One idea explains every low-stock notification you will ever see
+    &mdash; and it takes about twenty seconds to understand.
+  </p>
+</div>
+
+<div class="bigidea">
+  <p class="lead-in">The one thing to remember</p>
+  <p class="line">The number 0.5 means &ldquo;half a week&rsquo;s worth&rdquo;</p>
+  <p class="sub">That is the whole rule.</p>
+</div>
+
+<section>
+  <h2><span class="n">01</span>What the alert is actually saying</h2>
+
+  <p>You sold a certain number of eggs in the last seven days. The <code>0.5</code> setting simply
+  divides that number <strong>by two</strong>. Whatever you end up with is your <strong>warning line</strong>.</p>
+
+  <div class="calc">How many eggs you sold this week    1,551
+<span class="rule">-------------------------------------------------</span>
+Divide by 2  (because the setting says 0.5)      <b>776</b>  &larr; your <b>warning line</b>
+<span class="rule">-------------------------------------------------</span>
+<b>The rule:   fewer than 776 eggs left   &rarr;   warn me</b></div>
+
+  <p>That is all a low-stock alert is. There is no hidden cleverness.</p>
+</section>
+
+<section>
+  <h2><span class="n">02</span>Your real numbers</h2>
+  <p>Using Medium (MD) from your own database:</p>
+
+  <div class="calc">Sold in last 7 days                      1,551 eggs
+Warning line  =  1,551 &divide; 2  =                    <b>776 eggs</b>
+You actually have                                       6,900 eggs
+
+6,900 is much more than 776   &rarr;   <b>nothing to worry about</b></div>
+
+  <div class="box ok">
+    <div class="box-t">Why you are not seeing alerts</div>
+    <p>You have roughly <strong>31 days of stock</strong> on every egg size. The alert only wakes up
+    when you are down to about <strong>3 and a half days</strong> left. You are nowhere near that yet,
+    so silence here is good news.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">03</span>Why &ldquo;half a week&rdquo; is the right moment to warn</h2>
+  <p>You sell about <strong>222 eggs a day</strong>. So the warning line is really a countdown:</p>
+  <div class="calc">776 eggs  &divide;  222 a day  =  <b>3.5 days left</b></div>
+  <p>Read any alert as: <em>&ldquo;You only have a few days of eggs &mdash; time to restock.&rdquo;</em></p>
+</section>
+
+<section>
+  <h2><span class="n">04</span>Choosing your own number</h2>
+  <p>Think of the setting as a dial for <strong>how much buffer you want to keep</strong>.</p>
+
+  <table>
+    <thead>
+      <tr><th>You set</th><th>It means</th><th class="n">Warns you when</th><th>Good for</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="v">0.3</td><td>one-third of a week</td><td class="n">2 days left</td><td>Fast, reliable deliveries</td></tr>
+      <tr class="you"><td class="v">0.5</td><td>half a week</td><td class="n">3.5 days left</td><td>Your current setting</td></tr>
+      <tr><td class="v">0.7</td><td>most of a week</td><td class="n">5 days left</td><td>Hard to find new stock</td></tr>
+    </tbody>
+  </table>
+
+  <div class="remember">
+    <p class="rl">Lower number = warn later &nbsp;&nbsp;&nbsp;&nbsp; Higher number = warn earlier</p>
+    <p class="rt">Restocking takes 2 days? &nbsp;Use <strong>0.3</strong>.<br>
+    Restocking takes 3&ndash;4 days? &nbsp;Use <strong>0.5</strong>.<br>
+    Restocking takes over 5 days? &nbsp;Use <strong>0.7</strong>.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">05</span>What you will see when it fires</h2>
+  <div class="step avoid">
+    <div class="dot">1</div>
+    <div class="stepbody">
+      <div class="st">The warning line is worked out</div>
+      <div class="sd">Your week&rsquo;s sales are halved. That number is the line.</div>
+    </div>
+  </div>
+  <div class="step avoid">
+    <div class="dot">2</div>
+    <div class="stepbody">
+      <div class="st">Your stock is measured against it</div>
+      <div class="sd">Less than the line means the alert appears.</div>
+    </div>
+  </div>
+  <div class="step avoid">
+    <div class="dot">3</div>
+    <div class="stepbody">
+      <div class="st">You are told how many days are left</div>
+      <div class="sd">Not eggs &mdash; <em>days</em>. That is the number to think in.</div>
+    </div>
+  </div>
+  <div class="step avoid">
+    <div class="dot">4</div>
+    <div class="stepbody">
+      <div class="st">You are told how many trays to buy</div>
+      <div class="sd">So the alert is already a shopping list, not just a worry.</div>
+    </div>
+  </div>
+</section>
+
+<div class="pagebreak"></div>
+
+<section>
+  <h2><span class="n">06</span>An example, start to finish</h2>
+  <p>Suppose your Medium stock drops to <strong>690 eggs</strong> and sales have not changed:</p>
+
+  <div class="calc">Step 1   Warning line     1,551 &divide; 2        =   776 eggs
+Step 2   Compare            690 is less than 776      =   <b>LOW STOCK</b>
+Step 3   Days left          690 &divide; 222 a day    =   <b>3.1 days</b>
+Step 4   What is missing    776 &minus; 690          =   86 eggs short
+Step 5   What to buy        86 &divide; 30 per tray   =   2.9  &rarr;  <b>buy 3 trays</b></div>
+
+  <div class="box avoid">
+    <div class="box-t">That is the entire alert</div>
+    <p class="sample">Low stock: Medium &mdash; 690 eggs left (about 3.1 days of cover).<br>
+    Check: 690 &lt; 776 cutoff = 1,551 sold in 7d &times; 0.5 threshold.<br>
+    Short by 86 eggs &mdash; buy 3 trays to clear it.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">07</span>Two special cases</h2>
+  <table>
+    <thead>
+      <tr><th style="width:30%">Situation</th><th>What happens</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="v">You have zero eggs</td>
+        <td><span class="pill p-red">HIGH ALERT</span> &nbsp;Always fires, whatever the setting is.
+        There is nothing to sell at all, so it skips the calculation entirely.</td>
+      </tr>
+      <tr>
+        <td class="v">A quiet week</td>
+        <td>If a size sold nothing in the last 7 days, the system uses the
+        <strong>forecast</strong> instead. The alert tells you which one it used.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">08</span>How to change it</h2>
+  <ol>
+    <li>Open the <strong>Settings</strong> page.</li>
+    <li>Find the row called <code>low_stock_threshold</code>.</li>
+    <li>Type a decimal &mdash; <code>0.6</code>, <strong>not</strong> <code>60</code>.</li>
+    <li>Press <strong>Update</strong>. It takes effect straight away.</li>
+  </ol>
+
+  <div class="box avoid">
+    <div class="box-t">Two helpful things to look for</div>
+    <p><strong>1.</strong> The Settings page now shows a &ldquo;What low stock actually means here&rdquo;
+    panel listing every egg size with its stock, its weekly sales, its warning line and how many days
+    of cover that is.</p>
+    <p style="margin-bottom:0;"><strong>2.</strong> Allowed values run from <code>0.1</code> to
+    <code>1.0</code>. Anything outside that range is quietly pulled back to the nearest limit.</p>
+  </div>
+</section>
+
+<div class="remember">
+  <p class="rl">If you remember nothing else</p>
+  <p class="rt" style="font-size:15pt;">
+    Divide this week&rsquo;s sales by two.<br>
+    Fewer eggs than that? &nbsp;<strong>Time to restock.</strong>
+  </p>
+</div>
+
+<div class="foot">
+  EggLogan Egg Storage &middot; Low Stock Alerts, Plain Language Guide &middot;
+  Figures taken from your live database
+</div>
+
+</body>
+</html>
